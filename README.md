@@ -1,6 +1,6 @@
 # SIV
 
-## REFRENCES
+## REFERENCES
 
 ### REPOSITORIES
 [arjundixit98, Defogging-Images-using-Dark-Channel-Prior](https://github.com/arjundixit98/Defogging-Images-using-Dark-Channel-Prior.git)
