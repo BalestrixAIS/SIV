@@ -72,12 +72,15 @@ def dehaze_image(image_path):
     return (image, dark_channel, transmission, dehazed_image)
 
 if __name__ == "__main__":
-    image_path = "src/images/ristorante.jpg"
+    image_path = "data/test_images/ristorante.jpg"
+    
     image, dark_channel, transmission, dehazed_image = dehaze_image(image_path)
 
     cv2.imshow("Original Image", image)
     cv2.imshow("Dark Channel", dark_channel)
     cv2.imshow("Transmission Map", transmission)
     cv2.imshow("Dehazed Image", cv2.cvtColor((dehazed_image * 255).astype(np.uint8), cv2.COLOR_RGB2BGR))
-    cv2.waitKey(0)
+    # wait for the key q to close the window
+    while cv2.waitKey(1) != ord("q"):
+        pass
     cv2.destroyAllWindows()
