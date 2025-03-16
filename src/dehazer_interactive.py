@@ -16,7 +16,7 @@ def get_dark_channel(image, patch_size=15):
     return dark_channel
 
 # 3. Estimate the atmospheric light
-def get_atmospheric_light(image, dark_channel, top_percent=0.001):
+def get_atmospheric_light(image, dark_channel, top_percent=0.0001):
     flat_dark = dark_channel.ravel()
     num_pixels = flat_dark.size
     num_brightest = int(num_pixels * top_percent)
@@ -27,6 +27,17 @@ def get_atmospheric_light(image, dark_channel, top_percent=0.001):
     atmospheric_light = np.mean(image[brightest_pixels], axis=0)
     return atmospheric_light
 
+def refine_transmission(image, transmission, radius=60, epsilon=1e-3):
+    image = (image * 255).astype(np.uint8)
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    refined_transmission = cv2.ximgproc.guidedFilter(
+        guide=gray.astype(np.float32),  
+        src=transmission.astype(np.float32),
+        radius=radius,
+        eps=epsilon
+    )
+    return refined_transmission
+
 # 4. Estimate the transmission map
 def get_transmission_map(image, atmospheric_light, patch_size=15, omega=0.95):
     norm_image = image / atmospheric_light
@@ -35,7 +46,9 @@ def get_transmission_map(image, atmospheric_light, patch_size=15, omega=0.95):
 
     # Handle sky regions where transmission should be close to 0
     transmission = np.clip(transmission, 0.1, 1)
-    return transmission
+    #return transmission
+    refined_transmission = refine_transmission(image, transmission)
+    return refined_transmission
 
 # 6. Recover the haze-free image
 def recover_image(image, transmission, atmospheric_light, t0=0.1):
@@ -59,12 +72,12 @@ def dehaze_image(image_path):
     return (image, dark_channel, transmission, dehazed_image)
 
 if __name__ == "__main__":
-    image_path = "src/images/tiananmen.png"
+    image_path = "src/images/ristorante.jpg"
     image, dark_channel, transmission, dehazed_image = dehaze_image(image_path)
 
     cv2.imshow("Original Image", image)
     cv2.imshow("Dark Channel", dark_channel)
     cv2.imshow("Transmission Map", transmission)
-    cv2.imshow("Dehazed Image", dehazed_image)
+    cv2.imshow("Dehazed Image", cv2.cvtColor((dehazed_image * 255).astype(np.uint8), cv2.COLOR_RGB2BGR))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
