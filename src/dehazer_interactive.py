@@ -1,8 +1,16 @@
 import cv2
 import numpy as np
+import os
 
 # 1. Load the image and convert to the right format
 def load_image(path):
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Image file '{path}' not found.")
+
+    image = cv2.imread(path)
+    if image is None:
+        raise ValueError(f"Could not read image '{path}'. Check the file format and permissions.")
+
     image = cv2.imread(path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = image / 255.0  # Normalize to [0, 1] range
@@ -72,7 +80,7 @@ def dehaze_image(image_path):
     return (image, dark_channel, transmission, dehazed_image)
 
 if __name__ == "__main__":
-    image_path = "data/test_images/ristorante.jpg"
+    image_path = "data/test_images/lake.jpg"
     
     image, dark_channel, transmission, dehazed_image = dehaze_image(image_path)
 
@@ -84,3 +92,4 @@ if __name__ == "__main__":
     while cv2.waitKey(1) != ord("q"):
         pass
     cv2.destroyAllWindows()
+    
