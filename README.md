@@ -24,7 +24,7 @@ The process is summarized in the diagram below:
 
 ![Architecture](images/architecture.png)
 
-## PROCEDURE
+## HOW TO RUN
 
 To set up and run the project on your local environment, follow these steps:
 
